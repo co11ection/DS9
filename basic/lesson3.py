@@ -38,7 +38,6 @@ print(list1)
 # remove
 list1.remove('банан')
 print(list1.pop(1)) # по дефолту удаляет последний элемент, но можно удалить и по индексу
-
 print(list1)
 
 list3 = [1, 2, 3, 4, 5]
@@ -98,8 +97,8 @@ print(id(ls2))
 set1 = {"hello", 1, 2, 1, 3, 2, 3, 4}
 set1.add(5)
 # set1.remove(3)
-set1.pop()
-# set1.clear()
+# set1.pop()
+# set1."clear()
 print(set1)
 
 a = set()
