@@ -118,8 +118,11 @@ print(outliers[['pclass', 'sex', 'age', 'fare']])
 
 # Z = (x - mean) / std)
 # std - стандартное отклонение
+# std = |среднее значение - минимум| |максимум - среднее значение|
 # x - значение
 # mean - среднее значение
 print(df['fare'].describe()) 
 from scipy import stats
-
+z_score = stats.zscore(df['fare'])
+print(z_score)
+print(df[abs(z_score)>3][['pclass', 'sex', 'age', 'fare']])
