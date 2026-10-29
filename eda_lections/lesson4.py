@@ -176,3 +176,63 @@ print(penguins_scalled)
 penguins_df = pd.DataFrame(penguins_scalled, columns=penguins_data.columns)
 print(penguins_df)
 print(penguins_df.describe())
+
+
+minmax_scaller = MinMaxScaler()
+penguins_minmax = minmax_scaller.fit_transform(penguins_data)
+# (x - min)/(max - min)
+penguins_df = pd.DataFrame(penguins_minmax, columns=penguins_data.columns)
+print(penguins_df)
+print(penguins_df.describe())
+print(penguins)
+
+""" 
+Feture Selection
+решает проблемы такие как
+лишние признаки, выбросы -ШУМ - так как модель начинает путаться
+дубли - два одинаковых столбца либо одинаковые строки
+чем больше признаков(колонки)  = дольше обработка данных и обучение модели
+
+Нам нужно оставить только полезные признаки
+"""
+
+# penguins_corr = penguins.corr(numeric_only=True)
+# plt.figure(figsize=(4,4))
+# sns.heatmap(
+#     penguins_corr,
+#     annot=True,
+#     cmap='RdBu_r',
+#     fmt='.2'
+# )
+# plt.title("Корреляция")
+# plt.show()
+
+
+penguins_corr = penguins.corr(numeric_only=True).abs()
+mask = penguins_corr.where(
+    np.triu(
+        np.ones(penguins_corr.shape),
+        k=1
+    ).astype(bool)
+)
+to_drop = [
+    column for column in mask.columns
+    if any(mask[column]>0.8) 
+]
+print(to_drop)
+
+clean_data = penguins.drop(columns=to_drop)
+print(penguins.shape)
+print(clean_data.shape)
+
+from sklearn.feature_selection import mutual_info_regression
+
+target = penguins['body_mass_g']
+features = penguins[['bill_length_mm', "bill_depth_mm", "flipper_length_mm"]]
+mi = mutual_info_regression(features, target)
+data = pd.Series(
+    mi, index=features.columns
+)
+data_sort = data.sort_values(ascending=False)
+print("====== MI ====")
+print(data_sort)
