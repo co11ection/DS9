@@ -188,3 +188,79 @@ print(
      
 )
 
+# Парадокс Симпсона и ловушка агрегирования
+""" 
+Парадокс Симпсона - ситуация, когда тенденция, видимых общих данных исчезает либо разворачивается при разбиение на подгруппы(и наоборот)
+
+Причина - скрытая третья переменная, группы разного размера перевешивают общий итог по разному
+
+Защита - при любом сравнении долей либо среддних между группами - проверяйте результат еще и внутри разумных подгрупп
+
+"""
+
+
+stones = pd.DataFrame({
+    "grouop": ["мелкие", 'мелкие', 'крупные', 'крупные'],
+    "method": ['A', "B", "A", "B"],
+    "success": [81, 234, 192, 55],
+    "total": [87, 270, 263, 80]
+}
+)
+stones['rate'] = (
+    stones['success'] / stones['total'] * 100
+).round(1)
+print(stones)
+
+totals = stones.groupby('method')[['success', 'total']].sum()
+totals['rate'] = (
+    totals['success']/totals['total'] * 100
+).round(1)
+print(totals)
+
+
+
+sizes = pd.crosstab(df_clean['city'], df_clean['category'])
+print(sizes)
+
+print("min", sizes.values.min())
+print("max", sizes.values.max())
+
+print((sizes < 5).sum().sum())
+
+
+ct = pd.crosstab(df_clean['city'], df_clean['is_returned'])
+print(ct)
+# Данных мало и парадокс симпсона искать смысла нету
+
+
+# Поиск аномалий по нескольким признакам сразу 
+""" 
+Состовное Анамалия сумируется по нескольким булевым сигналам
+
+|z|>2 - распростроненным, но условным порогом(примерно 5% от самых крайних значений нормального распределения)
+"""
+
+price_z = (
+    df_clean['price'] - df_clean['price'].mean()
+) / df_clean['price'].std()
+
+qty_z = (
+    df_clean['quantity'] - df_clean['quantity'].mean()
+) / df_clean['quantity'].std()
+
+
+df_clean['price_z_outliers'] = price_z.abs()>2
+df_clean["quantity_z_outliers"] = qty_z.abs()>2
+
+print(df_clean['price_z_outliers'].sum())
+print(df_clean['quantity_z_outliers'].sum())
+
+
+anomaly_score = (
+    df_clean["price_z_outliers"].astype(int)
+    + df_clean["quantity_z_outliers"].astype(int)
+    + df_clean['rating_is_missed'].astype(int)
+    + df_clean['price_is_zero'].astype(int)
+)
+print(anomaly_score.head(20))
+print(anomaly_score.value_counts().sort_index())

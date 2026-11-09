@@ -1,0 +1,11 @@
+import pandas as pd
+import random
+
+import sweetviz as sv
+
+df = pd.DataFrame()
+df['variable'] = [random.gauss(0., 1.) for idx in range(1000)]
+
+report = sv.analyze(df)
+report.show_html('sv_plot_cutoff.html',
+                 layout='vertical')
